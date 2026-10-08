@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, View, FlatList, SafeAreaView, TextInput } from 'react-native';
 
-// ==========================================
-// 1. TYPE & ARRAY OF OBJECTS (Bobot: 10%)
-// ==========================================
+
 export interface StaffMember {
   id: string;
   name: string;
@@ -29,9 +27,7 @@ const initialStaff: StaffMember[] = [
   { id: '9', name: 'Hendra Gunawan', role: 'Koki', branch: 'Cabang Blimbing', shift: 'Siang' },
 ];
 
-// ==========================================
-// 2. CUSTOM FUNCTION & LOOP (Bobot: 10%)
-// ==========================================
+
 
 // Custom Function 1: Filter dengan Loop
 function searchStaffList(list: StaffMember[], keyword: string): StaffMember[] {
@@ -54,9 +50,7 @@ function countTotalStaff(list: StaffMember[]): number {
   return count;
 }
 
-// ==========================================
-// MAIN COMPONENT
-// ==========================================
+
 export default function StaffScreen() {
   const [search, setSearch] = useState<string>('');
   const [staff] = useState<StaffMember[]>(initialStaff);
@@ -109,7 +103,7 @@ export default function StaffScreen() {
                         ? '#27ae60'
                         : item.role === 'Koki'
                         ? '#e67e22'
-                        : '#2980b9', // INLINE STYLE DINAMIS
+                        : '#2980b9', 
                   },
                 ]}
               >
@@ -126,9 +120,7 @@ export default function StaffScreen() {
   );
 }
 
-// ==========================================
-// 3. EXTERNAL STYLES (StyleSheet)
-// ==========================================
+
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#f4f6f8' },
   header: {
