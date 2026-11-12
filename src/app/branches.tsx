@@ -1,86 +1,44 @@
-import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, FlatList, SafeAreaView, TextInput, TouchableOpacity } from 'react-native';
-import { useRouter } from 'expo-router';
+import React, { useEffect, useState } from "react";
+import { ActivityIndicator, FlatList, SafeAreaView, StyleSheet, Text, View } from "react-native";
+import { CabangWarung, getCabangWarung } from "../services/warungApi";
 
-export default function BranchScreen() {
-  const router = useRouter();
-  const [search, setSearch] = useState('');
+export default function BranchesScreen() {
+  const [cabang, setCabang] = useState<CabangWarung[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 500);
-    return () => clearTimeout(timer);
+    getCabangWarung()
+      .then((data) => setCabang(data))
+      .catch((err) => setError(String(err)))
+      .finally(() => setLoading(false));
   }, []);
 
-  const dummyBranches = [
-    { id: '1', name: 'Warung Cabang Dinoyo', address: 'Jl. MT Haryono No. 10', status: 'Buka' },
-    { id: '2', name: 'Warung Cabang SoeHat', address: 'Jl. Soekarno Hatta No. 45', status: 'Buka' },
-  ];
-
-  const filteredBranches = dummyBranches.filter(item => 
-    item.name.toLowerCase().includes(search.toLowerCase())
-  );
+  if (loading) return <ActivityIndicator size="large" color="#ff8c00" style={{ flex: 1 }} />;
+  if (error) return <Text style={styles.error}>{error}</Text>;
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <View style={styles.topNav}>
-          <TouchableOpacity style={styles.navBtn} onPress={() => router.back()}>
-            <Text style={styles.navBtnText}>⬅ Kembali</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.navBtn} onPress={() => router.replace('/')}>
-            <Text style={styles.navBtnText}>🏠 Home</Text>
-          </TouchableOpacity>
-        </View>
-        <Text style={styles.headerTitle}>Pilih Cabang Warung</Text>
-      </View>
-
-      <View style={styles.searchContainer}>
-        <TextInput
-          style={styles.input}
-          placeholder="Cari cabang..."
-          value={search}
-          onChangeText={setSearch}
-        />
-      </View>
-
-      {loading ? (
-        <Text style={{ textAlign: 'center', marginTop: 20 }}>Memuat data cabang...</Text>
-      ) : (
-        <FlatList
-          data={filteredBranches}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <View style={styles.card}>
-              <Text style={styles.title}>{item.name}</Text>
-              <Text style={styles.subtitle}>{item.address}</Text>
-              
-              <TouchableOpacity 
-                style={styles.button}
-                onPress={() => router.push('/inventory')} 
-              >
-                <Text style={styles.buttonText}>Cek Inventori Cabang Ini ➔</Text>
-              </TouchableOpacity>
-            </View>
-          )}
-        />
-      )}
+      <FlatList
+        data={cabang}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <View style={styles.card}>
+            <Text style={styles.title}>🏪 Warung Cabang {item.name}</Text>
+            <Text style={styles.sub}>Wilayah: Kota Malang, Jawa Timur (Kode Area: {item.id})</Text>
+            <Text style={styles.status}>● Operasional Aktif</Text>
+          </View>
+        )}
+      />
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f9f9f9' },
-  header: { padding: 16, backgroundColor: '#ff8c00' },
-  topNav: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 },
-  navBtn: { backgroundColor: 'rgba(255,255,255,0.25)', padding: 6, borderRadius: 6 },
-  navBtnText: { color: '#fff', fontSize: 12, fontWeight: 'bold' },
-  headerTitle: { fontSize: 18, fontWeight: 'bold', color: '#fff', textAlign: 'center' },
-  searchContainer: { padding: 16 },
-  input: { backgroundColor: '#fff', padding: 12, borderRadius: 8, borderWidth: 1, borderColor: '#ddd' },
-  card: { backgroundColor: '#fff', padding: 16, marginHorizontal: 16, marginBottom: 12, borderRadius: 8, elevation: 2 },
-  title: { fontSize: 16, fontWeight: 'bold', color: '#333' },
-  subtitle: { fontSize: 14, color: '#666', marginTop: 4 },
-  button: { marginTop: 12, backgroundColor: '#ff8c00', padding: 8, borderRadius: 6, alignItems: 'center' },
-  buttonText: { color: '#fff', fontWeight: 'bold' }
+  container: { flex: 1, backgroundColor: "#f4f6f8", padding: 16 },
+  error: { color: "red", padding: 20, textAlign: "center" },
+  card: { backgroundColor: "#fff", padding: 14, borderRadius: 10, marginBottom: 10, elevation: 2 },
+  title: { fontSize: 16, fontWeight: "bold", color: "#ff8c00" },
+  sub: { fontSize: 13, color: "#555", marginTop: 4 },
+  status: { fontSize: 12, color: "#27ae60", fontWeight: "bold", marginTop: 6 },
 });
